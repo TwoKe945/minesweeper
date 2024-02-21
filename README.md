@@ -13,6 +13,4 @@
 
 # 运行效果
 
-<video id="video" controls="" preload="none" poster="封面">
-  <source id="mp4" src="./doc/play.mp4" type="video/mp4">
-</videos>
+![扫雷游戏运行效果](./doc/play.gif)

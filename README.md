@@ -10,3 +10,9 @@
 
 - 鼠标左键：排雷
 - 鼠标右键：插旗
+
+# 运行效果
+
+<video id="video" controls="" preload="none" poster="封面">
+  <source id="mp4" src="./doc/play.mp4" type="video/mp4">
+</videos>

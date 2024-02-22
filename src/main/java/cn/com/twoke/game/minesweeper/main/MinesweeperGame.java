@@ -38,7 +38,7 @@ public class MinesweeperGame extends Game implements MouseMotionListener, MouseL
 	};
 	
 //	private float mineDensity = 0.2063f;
-	private float mineDensity = 0.1f;
+	private float mineDensity = 0.15625f;
 	private Random random;
 	private int[][] mines;
 	private int[][] overlayer;
@@ -250,6 +250,9 @@ public class MinesweeperGame extends Game implements MouseMotionListener, MouseL
 		long tempTime = System.currentTimeMillis();
 		if (tempTime - prevTime >= 1000) {
 			lostTime++;
+			if (lostTime >= 999) { // 时间超出999秒，默认为失败
+				gameOver = true;
+			}
 			prevTime = tempTime;
 		}
 	}

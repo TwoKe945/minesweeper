@@ -3,6 +3,7 @@ package cn.com.twoke.game.minesweeper.main;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -15,6 +16,7 @@ import java.util.stream.Collectors;
 import cn.com.twoke.game.minesweeper.constant.ImageResource;
 import cn.com.twoke.game.minesweeper.framework.core.Game;
 import cn.com.twoke.game.minesweeper.framework.core.GamePanel;
+import cn.com.twoke.game.minesweeper.utils.DiodeNumberUtils;
 
 public class MinesweeperGame extends Game implements MouseMotionListener, MouseListener {
 	
@@ -28,8 +30,6 @@ public class MinesweeperGame extends Game implements MouseMotionListener, MouseL
 	public static final int WIDTH = COL * TILE_SIZE;
 	public static final int HEIGHT = ROW * TILE_SIZE + MARGIN_TOP;
 
-	
-	
 	public static final BufferedImage[] NUMBER_IMAGES = new BufferedImage[]{
 			ImageResource.NUM_0,
 			ImageResource.NUM_1,
@@ -42,18 +42,7 @@ public class MinesweeperGame extends Game implements MouseMotionListener, MouseL
 			ImageResource.NUM_8
 	};
 	
-	public static final BufferedImage[] DIODE_NUMBER_IMAGES = new BufferedImage[]{
-			ImageResource.DIODE_NUM_0,
-			ImageResource.DIODE_NUM_1,
-			ImageResource.DIODE_NUM_2,
-			ImageResource.DIODE_NUM_3,
-			ImageResource.DIODE_NUM_4,
-			ImageResource.DIODE_NUM_5,
-			ImageResource.DIODE_NUM_6,
-			ImageResource.DIODE_NUM_7,	
-			ImageResource.DIODE_NUM_8,
-			ImageResource.DIODE_NUM_9,
-	};
+
 	
 	
 //	private float mineDensity = 0.2063f;
@@ -204,65 +193,41 @@ public class MinesweeperGame extends Game implements MouseMotionListener, MouseL
 		drawGameState(g);
 	}
 	
+	
+	
+	private static final int EMOJI_X = (int)((WIDTH - 25 ) / 2 * SCALE);
+	private static final int EMOJI_Y = (int)(4 * SCALE);
+	private Rectangle emojiHitbox = new Rectangle(EMOJI_X, EMOJI_Y, TILE_SIZE, TILE_SIZE);
+	private boolean pressedRestart = false;
 	/**
 	 * 绘制游戏状态
 	 * @param g
 	 */
 	private void drawGameState(Graphics g) {
 		// 地雷剩余总数
-		drawScore(getNumbers(mineCount - flagCount, 3), 2, 4, -1).accept(g);
-		drawScore(getNumbers(lostTime, 3), 2, 4, 1).accept(g);
-		g.drawImage( gameOver ? ImageResource.OVER : ImageResource.SMILE, (WIDTH - 21 ) / 2, (int)(6 * SCALE), 
+		DiodeNumberUtils.drawAlignLeft(mineCount - flagCount, 3, 2, 4).accept(g);
+		DiodeNumberUtils.drawAlginRight(lostTime, 3, 2, 4).accept(g);
+		if (!pressedRestart) {
+			g.drawImage(ImageResource.OVERLAYER, EMOJI_X, EMOJI_Y, 
+					TILE_SIZE, TILE_SIZE, null);
+		}	else {
+			g.drawImage(ImageResource.NUM_0, EMOJI_X, EMOJI_Y, 
+					TILE_SIZE, TILE_SIZE, null);
+		}
+		g.drawImage( gameOver ? ImageResource.OVER : ImageResource.SMILE, EMOJI_X + 2, EMOJI_Y + 2, 
 				(int)(21 * SCALE), (int)(21 * SCALE), null);
-		//
+		
+		
+		// 游戏完成时
 		if(gameSuccess) {
 			g.setColor(new Color(0,0,0, 200));
 			g.fillRect(0, 0, WIDTH, HEIGHT);
 			g.setColor(Color.WHITE);
-			g.drawString("Game SUCCESS!!", WIDTH / 2 - 30, HEIGHT / 2);
+			g.drawString("Game Success!!", WIDTH / 2 - 30, HEIGHT / 2);
 		}
 		
 	}
 	
-	private static Integer[] getNumbers(long number, int length) {
-		String numberText = String.valueOf(number);
-		if (numberText.length()>= length) {
-			return Arrays.asList(numberText.substring(numberText.length() - 3, numberText.length() ).split("")).stream().map(Integer::parseInt).collect(Collectors.toList())
-					.toArray(new Integer[length]);
-		} else {
-			int zeroCount = length - numberText.length();
-			StringBuffer tempBuffer = new StringBuffer();
-			for (int i = 0; i < zeroCount; i++) {
-				tempBuffer.append("0");
-			}
-			return Arrays.asList(  (tempBuffer.append(numberText).toString()).split("")).stream().map(Integer::parseInt).collect(Collectors.toList())
-					.toArray(new Integer[length]);
-		}
-	}
-
-	private Consumer<Graphics> drawScore(Integer[] mineNumbers, int startX, int startY, int dir) {
-		if (dir == 1) {
-			return g -> {
-				for (int i = 0; i < mineNumbers.length; i++) {
-					g.drawImage(DIODE_NUMBER_IMAGES[mineNumbers[i]], (int)(( WIDTH - startX - (mineNumbers.length - i) * 13 ) * SCALE), (int)(startY * SCALE), 
-							(int)(13 * SCALE), (int)(23 * SCALE), null);
-				}
-			};
-		} else if (dir == -1) {
-			return g -> {
-				for (int i = 0; i < mineNumbers.length; i++) {
-					g.drawImage(DIODE_NUMBER_IMAGES[mineNumbers[i]], (int)((startX + i * 13 ) * SCALE), (int)(startY * SCALE), 
-							(int)(13 * SCALE), (int)(23 * SCALE), null);
-				}
-			};
-		}else {
-			return null;
-		}
-		
-	}
-	
-	
-
 	@Override
 	protected void update() {
 		updateLostTime();
@@ -347,9 +312,32 @@ public class MinesweeperGame extends Game implements MouseMotionListener, MouseL
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-		
+		if (e.getButton() == MouseEvent.BUTTON1) {
+			if (emojiHitbox.contains(e.getX(), e.getY())) {
+				pressedRestart = true;
+				restartGame();
+			}
+		}
 	}
 	
+	public void restartGame() {
+		restartOverlayer();
+		gameOver = false;
+		lostTime = 0;
+		flagCount = 0;
+		prevTime = System.currentTimeMillis();
+	}
+
+	private void restartOverlayer() {
+		for (int x = 0; x < COL; x++) {
+			for (int y = 0; y < ROW; y++) {
+				overlayer[y][x] = 0;
+			}
+		}
+	}
+
+
+
 	protected boolean gameOver;
 
 	@Override
@@ -359,6 +347,9 @@ public class MinesweeperGame extends Game implements MouseMotionListener, MouseL
 		int y = (e.getY()- MARGIN_TOP) / TILE_SIZE;
 		
 		if (e.getButton() == MouseEvent.BUTTON1) {
+			if (emojiHitbox.contains(e.getX(), e.getY())) {
+				pressedRestart = false;
+			}
 			if (e.getY() < MARGIN_TOP || overlayer[y][x] == -1) return;
 			if (mines[y][x] == -1) {
 				gameOver = true;

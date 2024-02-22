@@ -13,6 +13,8 @@ import java.util.Random;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import javax.imageio.metadata.IIOMetadataFormat;
+
 import cn.com.twoke.game.minesweeper.constant.ImageResource;
 import cn.com.twoke.game.minesweeper.framework.core.Game;
 import cn.com.twoke.game.minesweeper.framework.core.GamePanel;
@@ -199,6 +201,7 @@ public class MinesweeperGame extends Game implements MouseMotionListener, MouseL
 	private static final int EMOJI_Y = (int)(4 * SCALE);
 	private Rectangle emojiHitbox = new Rectangle(EMOJI_X, EMOJI_Y, TILE_SIZE, TILE_SIZE);
 	private boolean pressedRestart = false;
+	private BufferedImage controlImage = ImageResource.EMOJI_SMILE;
 	/**
 	 * 绘制游戏状态
 	 * @param g
@@ -214,18 +217,8 @@ public class MinesweeperGame extends Game implements MouseMotionListener, MouseL
 			g.drawImage(ImageResource.NUM_0, EMOJI_X, EMOJI_Y, 
 					TILE_SIZE, TILE_SIZE, null);
 		}
-		g.drawImage( gameOver ? ImageResource.OVER : ImageResource.SMILE, EMOJI_X + 2, EMOJI_Y + 2, 
+		g.drawImage(controlImage, EMOJI_X + 2, EMOJI_Y + 2, 
 				(int)(21 * SCALE), (int)(21 * SCALE), null);
-		
-		
-		// 游戏完成时
-		if(gameSuccess) {
-			g.setColor(new Color(0,0,0, 200));
-			g.fillRect(0, 0, WIDTH, HEIGHT);
-			g.setColor(Color.WHITE);
-			g.drawString("Game Success!!", WIDTH / 2 - 30, HEIGHT / 2);
-		}
-		
 	}
 	
 	@Override
@@ -246,6 +239,16 @@ public class MinesweeperGame extends Game implements MouseMotionListener, MouseL
 		if (mineCount == flagCount && overlayerCount == 0) {
 			gameSuccess = true;
 		}
+		
+		if (gameSuccess) {
+			controlImage = ImageResource.EMOJI_COOL;
+		} else if (gameOver) {
+			controlImage = ImageResource.EMOJI_OVER;
+		} else {
+			controlImage = ImageResource.EMOJI_SMILE;
+		}
+		
+		
 		
 	}
 
@@ -322,10 +325,27 @@ public class MinesweeperGame extends Game implements MouseMotionListener, MouseL
 	
 	public void restartGame() {
 		restartOverlayer();
+		restartMines();
+		restartBaseVar();
+	}
+
+	private void restartMines() {
+		if (!gameSuccess) return;
+		for (int x = 0; x < COL; x++) {
+			for (int y = 0; y < ROW; y++) {
+				mines[y][x] = 0;
+			}
+		}
+		initMines();
+	}
+
+	private void restartBaseVar() {
 		gameOver = false;
+		gameSuccess = false;
 		lostTime = 0;
 		flagCount = 0;
 		prevTime = System.currentTimeMillis();
+		bombPoint.setLocation(-1, -1);
 	}
 
 	private void restartOverlayer() {

@@ -34,8 +34,9 @@ public final class ImageResource {
 	public static final BufferedImage FLAG_WRONG;
 	public static final BufferedImage OVERLAYER;
 	
-	public static final BufferedImage SMILE;
-	public static final BufferedImage OVER;
+	public static final BufferedImage EMOJI_SMILE;
+	public static final BufferedImage EMOJI_OVER;
+	public static final BufferedImage EMOJI_COOL;
 	
 	static {
 		NUM_0 = ResourceLoader.loadImage("/0.gif");
@@ -65,8 +66,9 @@ public final class ImageResource {
 		FLAG_WRONG = ResourceLoader.loadImage("/flag_wrong.svg");
 		OVERLAYER = ResourceLoader.loadImage("/overlayer.gif");
 		
-		SMILE = ResourceLoader.loadImage("/smile.gif");
-		OVER = ResourceLoader.loadImage("/over.gif");
+		EMOJI_SMILE = ResourceLoader.loadImage("/smile.gif");
+		EMOJI_OVER = ResourceLoader.loadImage("/over.gif");
+		EMOJI_COOL = ResourceLoader.loadImage("/cool.gif");
 	}
 	
 	

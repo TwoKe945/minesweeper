@@ -1,6 +1,5 @@
 package cn.com.twoke.game.minesweeper.main;
 
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -8,12 +7,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
-import java.util.Arrays;
 import java.util.Random;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
-
-import javax.imageio.metadata.IIOMetadataFormat;
 
 import cn.com.twoke.game.minesweeper.constant.ImageResource;
 import cn.com.twoke.game.minesweeper.framework.core.Game;
@@ -22,7 +16,6 @@ import cn.com.twoke.game.minesweeper.utils.DiodeNumberUtils;
 
 public class MinesweeperGame extends Game implements MouseMotionListener, MouseListener {
 	
-
 	public static final int ROW = 9;
 	public static final int COL = ROW;
 	public static final int DEFAULT_TILE_SIZE = 25;
@@ -43,9 +36,6 @@ public class MinesweeperGame extends Game implements MouseMotionListener, MouseL
 			ImageResource.NUM_7,	
 			ImageResource.NUM_8
 	};
-	
-
-	
 	
 //	private float mineDensity = 0.2063f;
 	private float mineDensity = 0.1f;
